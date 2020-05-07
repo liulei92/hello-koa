@@ -1,21 +1,18 @@
 const Http = require('http');
 const Axios = require('axios');
 const Koa = require('koa'); // 导入 Koa
-const bodyparser = require('koa-bodyparser'); // 解析请求体的中间件
+const bodyparser = require('koa-bodyparser');
 const convert = require('koa-convert');
 const koaStatic = require('koa-static');
 const logger = require('koa-logger');
 const opener = require('opener');
-// const Router = require('koa-router'); // 注意require('koa-router')返回的是函数:
-
-const router = require('./router')
+const Router = require('koa-router'); // 注意require('koa-router')返回的是函数:
 
 // 创建一个对象
 const app = new Koa();
 
 app.convert = x => app.use.call(app, convert(x));
 
-// app.use(bodyParser()); // 解析请求体的中间件
 app.convert(bodyparser());
 //logger
 app.convert(logger());
@@ -57,48 +54,43 @@ app.use(async (ctx, next) => {
 //   `;
 // });
 
-// const hello = new Router(); // /hello/asdasd
+const hello = new Router();
 // 使用 koa-router --------
-// params传参
-// hello.get('/:name', async (ctx, next) => {
-//   console.log(ctx.params)
-//   if (ctx.params.name === '') {
-//     await next()
-//   } else {
-//     ctx.response.body = ctx.params.name
-//   }
-// });
+hello.get('/hello/:name', async (ctx, next) => {
+  console.log(ctx.params)
+  if (ctx.params.name === '') {
+    await next()
+  } else {
+    ctx.response.body = ctx.params.name
+  }
+})
 
-// const list = new Router(); // /list 和 /list/todo
-// // 嵌套路由
-// list.get('/', async (ctx, next) => {
-//   ctx.response.body = 'list/';
-// }).get('/todo', async (ctx, next) => {
-//   ctx.response.body = 'list/todo';
-// })
+const list = new Router();
+// 嵌套路由
+list.get('/list', async (ctx, next) => {
+  ctx.response.body = 'list';
+}).get('/todo', async (ctx, next) => {
+  ctx.response.body = 'list/todo';
+})
 
 // 装载所有路由
-// const router = new Router();
+const router = new Router();
 
-// router.use('/list', ListRouter.routes(), ListRouter.allowedMethods());
-// router.use('/article', ArticleRouter.routes(), ArticleRouter.allowedMethods());
-// router.use('/form', FormRouter.routes(), FormRouter.allowedMethods());
+router.use('/hello', hello.routes(), hello.allowedMethods())
+router.use('/list', list.routes(), list.allowedMethods())
 
+router.get('/', async (ctx, next) => {
+  ctx.response.body = '<h1>Hello Koa2!</h1>';
+});
 
-// router.get('/', async (ctx, next) => {
-//   ctx.response.body = '<h1>Hello Koa2!</h1>';
-// });
-
-
-// add router middleware:
+// // add router middleware:
 // app.use(hello.routes());
-// 当请求数据的方法与设置的方法不一致会报错
+// // 当请求数据的方法与设置的方法不一致会报错
 // app.use(hello.allowedMethods());
-// 加载路由中间件
+
 app.use(router.routes()).use(router.allowedMethods());
 
 // 使用 koa-router --------
-
 
 // app.listen(3003);
 // console.log('app started at port 3003...');
