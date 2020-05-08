@@ -5,3 +5,6 @@
 
 - 聊聊 koa 中间件
 进行中 https://juejin.im/post/5b5e780cf265da0f6b7713a8#heading-7 koa-better-body中间件
+
+- ejs语法戳这里
+> https://ejs.bootcss.com/
